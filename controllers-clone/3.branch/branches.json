@@ -1,0 +1,15 @@
+{
+  "branches": {
+    "main": {
+      "currentcommit": "initialCommitHash",
+      "history": []
+    },
+    "Kumar": {
+      "currentcommit": "initialCommitHash",
+      "history": [
+        "initialCommitHash"
+      ]
+    }
+  },
+  "activebranch": "Kumar"
+}
