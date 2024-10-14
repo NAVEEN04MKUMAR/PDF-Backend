@@ -13,7 +13,6 @@ const {Document,Packer,Paragraph,TextRun}=require('docx');
 // const pdfToimage = require('pdf-to-image');
 const mammoth = require("mammoth");
 const sharp = require('sharp');
-const PDFImage = require("pdf-image").PDFImage;
 const pdfex = require('pdf-extraction');
 const fileUpload = require('express-fileupload');
 const { exec } = require('child_process');
