@@ -16,7 +16,7 @@ async function readDocxFile(filePath) {
 }
 
 
-async function createdocxfromtext(text,outputpath){
+async function createdocxfromtext(text){
   // console.log('text',text);
   try{
   const paragraph = text.split(/[ ,]+/).map((line,index) =>{ 
@@ -67,11 +67,15 @@ paragraph.forEach((p, index) => {
 });
 
 
+
+
+
 const buffer=await Packer.toBuffer(doc);
 console.log('buffer',buffer);
-fs.writeFileSync(outputpath,buffer);
-console.log('docx file created at the :',outputpath);
-readDocxFile(outputpath);
+return buffer;
+// fs.writeFileSync(outputpath,buffer);
+// console.log('docx file created at the :',outputpath);
+// readDocxFile(outputpath);
   }catch(error){
     console.log('error docs creation from pdf:',error);
     throw new Error('docx creation failed');
@@ -91,10 +95,9 @@ function cleanExtractedText(text) {
 }
 
 
-async function extracttextfrompdf(filepath){
-  const databuffer=fs.readFileSync(filepath);
+async function extracttextfrompdf(pdfBuffer){
   try{
-    const data=await PdfParse(databuffer);
+    const data=await PdfParse(pdfBuffer);
     // console.log('text from pdf',data.text);
     const cleanedText = cleanExtractedText(data.text);
     return cleanedText;
@@ -109,39 +112,42 @@ const Converttodocx=async(req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
       }
-  const filepath=req.file.path;
-  console.log('filepath',filepath);
-
-const parsedpath = path.parse(filepath);
-const filename = parsedpath.name;
-console.log('Filename without extension:', filename);
-
-  const outputpath=path.join(__dirname,'../uploads',`converted_${filename}.docx`);
   try{
-
-  // const docxpath=filepath.replace('.pdf','.docx');
-  // console.log('docxpath',docxpath);
-  // await pdf2docx.convert(filepath,docxpath);
+   // Access the buffer directly from the uploaded file
+   const pdfBuffer = req.file.buffer;
+   console.log('PDF buffer retrieved successfully');
+ 
+  //  // Load PDF from buffer
+  //  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  //  console.log('PDF document loaded successfully');
+ 
+ 
 
 //convert pdf to docx
-const extractedtext=await extracttextfrompdf(filepath);
+const extractedtext=await extracttextfrompdf( pdfBuffer );
 // console.log('Extracted text:', extractedtext);
 console.log('Creating DOCX from extracted text...');
-await createdocxfromtext(extractedtext,outputpath);
+const docsbuffer=await createdocxfromtext(extractedtext);
+
+  // Convert the Uint8Array to a Base64 string using Buffer
+  const base64Decrypted = docsbuffer.toString('base64');
+  console.log('Base64 Decrypted:', base64Decrypted);
+
 // res.status(200).json({message:'pdf converted to docx successfully ',outputpath})
 
   
-const imagesdir=path.join('uploads','images');
-  if(!fs.existsSync(imagesdir)){
-    fs.mkdirSync(imagesdir);
-  }
+// const imagesdir=path.join('uploads','images');
+//   if(!fs.existsSync(imagesdir)){
+//     fs.mkdirSync(imagesdir);
+//   }
 
 
 
     res.status(200).send({
       message:'pdf coverted successfully',
-      docx:outputpath,
-      images:imagepaths,
+      base64Decrypted:base64Decrypted
+      // docx:outputpath,
+      // images:imagepaths,
     });
 
   }catch(error){

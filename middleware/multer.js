@@ -3,27 +3,27 @@ const path = require('path');
 const fs = require('fs');
 
 
-const uploadsDir = path.join(__dirname, 'uploads-file1/');
+// const uploadsDir = path.join(__dirname, 'uploads-file1/');
 
 // Create the uploads directory if it doesn't exist
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// if (!fs.existsSync(uploadsDir)) {
+//     fs.mkdirSync(uploadsDir, { recursive: true });
+// }
+
+const storage = multer.memoryStorage();
 
 
-
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        console.log('Destination called');
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         console.log('Destination called');
        
-        cb(null, uploadsDir); // Folder where files will be saved
-    },
-    filename: function (req, file, cb) {
-        console.log(`Uploading file: ${file.originalname}`); // Log file info
-        cb(null, `${Date.now()}_${file.originalname}`);
-    }
-});
+//         cb(null, uploadsDir); // Folder where files will be saved
+//     },
+//     filename: function (req, file, cb) {
+//         console.log(`Uploading file: ${file.originalname}`); // Log file info
+//         cb(null, `${Date.now()}_${file.originalname}`);
+//     }
+// });
 
 const fileFilter = (req, file, cb) => {
     console.log("Uploaded File: ", file.originalname); // Log the original file name

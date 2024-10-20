@@ -12,24 +12,24 @@ const Redact=async(req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
       }
-  const filepath=req.file.path;
-  console.log('filepath',filepath);
-  
-  const parsedpath = path.parse(filepath);
-  const filename = parsedpath.name;
-  console.log('Filename without extension:', filename);
-  
-  const outputpath=path.join(__dirname,'../uploads',`redacted_${filename}.pdf`);
-  
+// console.log('PDF document loaded successfully',pdfDoc);
+
+
   const redactionitems=JSON.parse(req.body.redactionitems||'[]');
   console.log('Fredaction items:', redactionitems);
   
   try{
   
-  const fileBuffer=fs.readFileSync(filepath);
-  console.log('File buffer', fileBuffer);
   
-  const Pdfdata=await PdfParse(fileBuffer);
+   // Access the buffer directly from the uploaded file
+   const pdfBuffer = req.file.buffer;
+   console.log('PDF buffer retrieved successfully');
+ 
+  //  // Load PDF from buffer
+  //  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  //  console.log('PDF document loaded successfully');
+  
+  const Pdfdata=await PdfParse(pdfBuffer);
   console.log('Pdf data', Pdfdata);
   
   let modifiedPdfdata=Pdfdata.text;
@@ -74,13 +74,19 @@ const Redact=async(req, res) => {
   
   const pdfbytes=await pdfDo1.save();
     console.log('pdf saved',pdfbytes);
-  
-  fs.writeFileSync(outputpath,pdfbytes);
+
+    
+
+     // Convert the Uint8Array to a Base64 string using Buffer
+ const base64Decrypted = Buffer.from(pdfbytes).toString('base64');
+ console.log('Base64 Decrypted:', base64Decrypted);
+
+  // fs.writeFileSync(outputpath,pdfbytes);
   
   
    res.status(200).json({
     message: 'PDF Redacted successful',
-    redactedFilePath: outputpath,
+    redactedFilePath:base64Decrypted ,
   
   });
   

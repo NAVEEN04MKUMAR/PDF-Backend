@@ -13,19 +13,19 @@ const Reorder=async(req, res) => {
   const file = req.file; // Assuming one file is being uploaded
      console.log('file');
     const filepath=file.path;
-
-  console.log('order:', order);
-  console.log('filepath:', filepath);
-
- 
-  // const filepath=path.join(__dirname,'../middlware/uploads-file1',filename);
-  console.log('filepath',filepath);
-  
   try{
+
+
+     // Access the buffer directly from the uploaded file
+   const pdfBuffer = req.file.buffer;
+   console.log('PDF buffer retrieved successfully');
+ 
+  //  // Load PDF from buffer
+  //  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  //  console.log('PDF document loaded successfully');
+  
    // load the uploaded pdf
-    const pdfbuffer=fs.readFileSync(filepath);
-    console.log('pdfbuffer',pdfbuffer)
-    const pdfdoc=await PDFDocument.load(pdfbuffer);
+    const pdfdoc=await PDFDocument.load(pdfBuffer);
     console.log('pdfdoc',pdfdoc);
 const newpdfdoc=await PDFDocument.create();
 console.log('newpdfdoc',newpdfdoc);
@@ -50,8 +50,13 @@ for(const index of order){
 const pdfbytes=await newpdfdoc.save();
 const newfilename=`reordered_${file.originalname}`;
 console.log(`Reordered PDF saved successfully as ${newfilename}.`);
-fs.writeFileSync(path.join(__dirname,'../uploads',newfilename),pdfbytes);
-res.status(200).send({message:'pdf reorder successfully',newfilename});
+// fs.writeFileSync(path.join(__dirname,'../uploads',newfilename),pdfbytes);
+
+     // Convert the Uint8Array to a Base64 string using Buffer
+     const base64Decrypted = Buffer.from(pdfbytes).toString('base64');
+     console.log('Base64 Decrypted:', base64Decrypted);
+    
+res.status(200).send({message:'pdf reorder successfully',base64Decrypted:base64Decrypted});
   }catch(error){
     console.error('error reordering files',error);
     res.status(500).send({message:"failed to reordering pdf"})

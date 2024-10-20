@@ -12,6 +12,7 @@ const {  Redact } = require('../controllers/redact.js');
 const {  Reorder } = require('../controllers/reorder.js');
 const {  Rewrite } = require('../controllers/Rewrite.js');
 const {  Split } = require('../controllers/Split.js');
+const {Decryption}=require('../controllers/Deecryption.js')
 
 
 const {  Createrepo } = require('../controllers-clone/createrepository.js');
@@ -32,6 +33,7 @@ router.post('/upload', upload.single('file'), uploadFile);
 router.post('/annotation-text-pdf', upload.single('file'), Annotationtestpdf);
 router.post('/converttodocx', upload.single('file'),   Converttodocx);
 router.post('/encrypt-pdf', upload.single('file'), Encryption);
+router.post('/decrypt-pdf', upload.single('file'), Decryption);
 router.post('/erase-pdf', upload.single('file'), Erase);
 router.post('/merge-pdf', upload.array('pdf',10), Mergepdf);
 router.post('/redaction-pdf', upload.single('file'), Redact);

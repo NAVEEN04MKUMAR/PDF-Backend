@@ -6,7 +6,7 @@ const path = require('path');
 
 
 // Function to merge multiple PDF buffers
-const mergePDFs = async (pdfbuffers, mergepdffilename) => {
+const mergePDFs = async (pdfbuffers) => {
     try {
       // Create a new PDFDocument
       const mergedPdf = await PDFDocument.create();
@@ -21,14 +21,18 @@ const mergePDFs = async (pdfbuffers, mergepdffilename) => {
         copiedPages.forEach((page) => mergedPdf.addPage(page));
       }
   
-      // Write the merged PDF to a file
+      // // Write the merged PDF to a file
       const mergedPdfBytes = await mergedPdf.save();
-      const outputPath = path.join(__dirname, '../uploads',  mergepdffilename);
+       // Convert the Uint8Array to a Base64 string using Buffer
+ const base64Decrypted = Buffer.from(mergedPdfBytes).toString('base64');
+ console.log('Base64 Decrypted:', base64Decrypted);
+
+      // const outputPath = path.join(__dirname, '../uploads',  mergepdffilename);
   
-      // Save the merged PDF file to the output path
-      fs.writeFileSync(outputPath, mergedPdfBytes);
+      // // Save the merged PDF file to the output path
+      // fs.writeFileSync(outputPath, mergedPdfBytes);
       
-      return outputPath; // Return the path of the merged PDF file
+      return base64Decrypted; // Return the path of the merged PDF file
     } catch (err) {
       console.error('Error during PDF merging:', err);
       throw new Error('Failed to merge PDFs');
@@ -40,19 +44,20 @@ const Mergepdf=async(req, res) => {
     const pdfbuffers=[];
     //read the uploaded file
     for(let file of req.files){
-      const pdfbuffer=fs.readFileSync(file.path);
+      const pdfbuffer=file.buffer;
       console.log('pdfbuffer',pdfbuffer);
       pdfbuffers.push(pdfbuffer);
     }
 
-    const mergepdffilename=`merge_${Date.now()}.pdf`;
-    console.log('filename',mergepdffilename);
+    
+    // const mergepdffilename=`merge_${Date.now()}.pdf`;
+    // console.log('filename',mergepdffilename);
 
-    const mergepdfpath=await mergePDFs(pdfbuffers,mergepdffilename);
-    console.log('mergepdfpath',mergepdfpath);
+    const base64Decrypted=await mergePDFs(pdfbuffers);
+    console.log('mergepdfpath',base64Decrypted);
 
-    req.files.forEach(file => fs.unlinkSync(file.path));
-    res.json({mergedpdfurl:`http://localhost:5002/download/${mergepdffilename}`});
+    // req.files.forEach(file => fs.unlinkSync(file.path));
+    res.json({mergedpdfurl:base64Decrypted});
 
   }catch(error){
   console.error('error merging files',error);
@@ -62,7 +67,8 @@ const Mergepdf=async(req, res) => {
   };
 
   
+  
 
   module.exports = {
-    Mergepdf,
+    Mergepdf
 };

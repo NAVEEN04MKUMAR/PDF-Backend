@@ -24,9 +24,9 @@ const {initwebsocket}=require('./websocket.js')
 // const {  processPDF }  =require('./file/drawshapes/save.js');
 const {mergePDFs}=require('./file/mergePDF.js')
 
-
+const dotenv = require('dotenv');
 const fileRoutes=require('./routes/fileroutes.js');
-
+// const cloudinary=require('./')
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -56,6 +56,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/', fileRoutes);
+require('dotenv').config();
 
 // Sample route
 app.get('/', (req, res) => {

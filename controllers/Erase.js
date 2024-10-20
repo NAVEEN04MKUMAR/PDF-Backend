@@ -12,28 +12,23 @@ const Erase=async(req, res) => {
   if (!req.file) {
       return res.status(400).send('No file uploaded.');
     }
-const filepath=req.file.path;
-console.log('filepath',filepath);
-
-
-const parsedpath = path.parse(filepath);
-const filename = parsedpath.name;
-console.log('Filename without extension:', filename);
-
-const outputpath=path.join(__dirname,'../uploads',`erase_${filename}.pdf`);
+  
+   
+// const outputpath=path.join(__dirname,'../uploads',`erase_${filename}.pdf`);
 
 try{
 
-const fileBuffer=fs.readFileSync(filepath);
-console.log('File buffer', fileBuffer);
 
 
-const existpdf=fs.readFileSync(filepath);
-console.log('File read successfully');
+   // Access the buffer directly from the uploaded file
+     const pdfBuffer = req.file.buffer;
+     console.log('PDF buffer retrieved successfully');
+   
+     // Load PDF from buffer
+     const pdfDoc = await PDFDocument.load(pdfBuffer);
+     console.log('PDF document loaded successfully');
+       
 
-
-console.log('Loading PDF document...');
-  const pdfDoc=await PDFDocument.load(existpdf);
   console.log('PDF document loaded successfully',pdfDoc);
 
 const lastpage=pdfDoc.getPages().pop();
@@ -59,18 +54,24 @@ const y=680;
 
 const pdfbytes=await pdfDoc.save();
   console.log('pdf saved',pdfbytes);
+ 
+  // const base64Decrypted = pdfbytes.toString('base64');
+  // console.log(' base64Decrypted',base64Decrypted );
 
-fs.writeFileSync(outputpath,pdfbytes);
+ // Convert the Uint8Array to a Base64 string using Buffer
+ const base64Decrypted = Buffer.from(pdfbytes).toString('base64');
+ console.log('Base64 Decrypted:', base64Decrypted);
+// fs.writeFileSync(outputpath,pdfbytes);
 
 
  res.status(200).json({
   message: 'PDF Erased successful',
-  eraseFilePath: outputpath,
+  eraseFilePath: base64Decrypted,
 });
 
 }
 catch (error) {
-  console.error('Error during PDF image compression:', error);
+  console.error('Error during PDF image erase', error);
 }
 
 };

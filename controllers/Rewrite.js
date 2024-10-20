@@ -14,33 +14,26 @@ const Rewrite= async(req, res) => {
   if (!req.file) {
       return res.status(400).send('No file uploaded.');
     }
-const filepath=req.file.path;
-console.log('filepath',filepath);
 
-const annotationtext=req.body.annotationtext;
+// const outputpath=path.join(__dirname,'../uploads',`Annotated-rewrite_${filename}.pdf`);
+
+try{
+  // Access the buffer directly from the uploaded file
+  const pdfBuffer = req.file.buffer;
+  console.log('PDF buffer retrieved successfully');
+
+  // Load PDF from buffer
+  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  console.log('PDF document loaded successfully');
+
+ const annotationtext=req.body.annotationtext;
 console.log('annotationtext',annotationtext);
 
 
 
-const parsedpath = path.parse(filepath);
-const filename = parsedpath.name;
-console.log('Filename without extension:', filename);
-
-const outputpath=path.join(__dirname,'../uploads',`Annotated-rewrite_${filename}.pdf`);
-
-try{
-
-const fileBuffer=fs.readFileSync(filepath);
-console.log('File buffer', fileBuffer);
-
-
-const existpdf=fs.readFileSync(filepath);
-console.log('File read successfully');
-
-
-console.log('Loading PDF document...');
-  const pdfDoc=await PDFDocument.load(existpdf);
-  console.log('PDF document loaded successfully',pdfDoc);
+// const parsedpath = path.parse(pdfDoc );
+// const filename = parsedpath.name;
+// console.log('Filename without extension:', filename);
 
 const lastpage=pdfDoc.getPages().pop();
 console.log('get the last page',lastpage);
@@ -66,13 +59,18 @@ const y=680;
 
 const pdfbytes=await pdfDoc.save();
   console.log('pdf saved',pdfbytes);
+   
+  // Convert the Uint8Array to a Base64 string using Buffer
+       const base64Decrypted = Buffer.from(pdfbytes).toString('base64');
+       console.log('Base64 Decrypted:', base64Decrypted);
+  
 
-fs.writeFileSync(outputpath,pdfbytes);
+// fs.writeFileSync(outputpath,pdfbytes);
 
 
  res.status(200).json({
   message: 'PDF rewrite successful',
-  rewriteFilePath: outputpath,
+  rewriteFilePath:  base64Decrypted ,
 });
 
 }
