@@ -32,7 +32,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 //https://vercel.live/link/pdf-frontend-gp7zeqfhh-naveenkumars-projects-79c7c003.vercel.app?via=deployment-domains-list&page=/
 app.use(cors({
-    origin: 'https://localhost:5173',
+    origin: 'https://localhost:5002',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
